@@ -68,8 +68,8 @@ annual_juvenile_graph <- ggplot(data = juvenile_table, aes(x = year, y = count))
   geom_bar(color = "coral4", fill = "coral3", stat = "identity")+
   scale_x_continuous(breaks = 1999:2012)+
   scale_y_continuous(limits=c(0, 130), breaks = c(0, 25, 50, 75, 100, 125))+
-  theme_light()+
-  labs( x = "Year", y = "Number of Juvenile Hare Traps", title = "Annual Juvenile Hare Trap Counts", subtitle = "1999-2012")+
+  theme_dark()+
+  labs( x = "Year", y = "Number of Juvenile Hare Trapped", title = "Annual Juvenile Hare Trap Counts", subtitle = "1999-2012")+
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5),
         axis.title.x = element_text(vjust = 0.2))
@@ -77,15 +77,14 @@ annual_juvenile_graph <- ggplot(data = juvenile_table, aes(x = year, y = count))
 annual_juvenile_graph
 ```
 
-```{r, include = FALSE}
+```{r}
 ## make it interactive
 ggplotly(annual_juvenile_graph)
 
 ```
 **Figure 1:** Annual juvenile hare trap counts- 
 
-The data visualization clearly shows that there is a huge variation between years in the number of juvenile hares that were collected. The max was 126 in 1999 and 
-
+The data visualization clearly shows that there is a huge variation between years in the number of juvenile hares that were collected. The max was 126 in 1999 and the minimum was 2 in 2010, excluding the years there were no data. In general, there is a larger number of hares collected in the first few years of the study than in the last part. The mean number of juvenile hares trapped over the 13 year period is 31.5 while the median is only 18.5. In moving forward, I would make sure that the people collecting data know that it is crucial to have uniform sampling effort from year to year. This means sampling at similar times each month with the same amount of traps set and the same amount of days. If the effort varies from year to year, the data will no longer reflect actual sample size. 
 
 
 ```{r, include = FALSE}
@@ -96,7 +95,8 @@ juvenile_summary_table <- juvenile_table %>%
             max_traps = max(count),
             min_traps = min(count))
 
-juvenile_summary_table
 ```
+
+## Visulize juvenile hare weights
 
 
