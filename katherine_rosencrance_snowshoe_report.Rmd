@@ -2,7 +2,9 @@
 title: "Juvenile Snowshoe Hare Exploratory Report"
 author: "Katherine Rosencrance"
 date: "11/7/2021"
-output: html_document
+output: 
+  html_document: 
+    theme: lumen
 ---
 # Introduction
 
@@ -20,16 +22,16 @@ output: html_document
 
 # Install packages
 
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-
+knitr::opts_chunk$set(echo = FALSE,message = FALSE,warning = FALSE)
 library(tidyverse)
 library(here)
 library(lubridate)
 library(plotly)
+library(ggbeeswarm)
 
 ```
 
-```{r, include = FALSE}
+```{r}
 
 # read in the data
 
@@ -37,7 +39,7 @@ bonanza_hares <- read_csv(here("data", "bonanza_hares.csv"))
 
 ```
 
-```{r, include = FALSE}
+```{r}
 
 # Wrangle to produce graph of total number of juvenile trappings during each year of the study
 
@@ -45,13 +47,11 @@ bonanza_hares <- read_csv(here("data", "bonanza_hares.csv"))
 juvenile_hare_traps <- bonanza_hares %>% 
   filter(age == "j") %>% 
   mutate(date = mdy(date)) %>% 
-  mutate(year = year(date)) %>%
+  mutate(year = year(date))
   
-  ## group by year
-  group_by(year)
 ```
 
-```{r, include = FALSE}
+```{r}
 ## create summary table to include count of traps by year
 
 juvenile_table <- juvenile_hare_traps %>% 
@@ -61,20 +61,30 @@ juvenile_table <- juvenile_hare_traps %>%
 ```
 
 
-```{r}
+```{r include = FALSE}
 
 ## produce graph
 annual_juvenile_graph <- ggplot(data = juvenile_table, aes(x = year, y = count)) +
-  geom_bar(color = "coral4", fill = "coral3", stat = "identity")+
+  geom_bar(color = "coral4",
+           fill = "coral3",
+           stat = "identity",
+           alpha = 0.7)+
   scale_x_continuous(breaks = 1999:2012)+
-  scale_y_continuous(limits=c(0, 130), breaks = c(0, 25, 50, 75, 100, 125))+
-  theme_dark()+
-  labs( x = "Year", y = "Number of Juvenile Hare Trapped", title = "Annual Juvenile Hare Trap Counts", subtitle = "1999-2012")+
+  scale_y_continuous(limits=c(0, 130),
+                     breaks = c(0, 25, 50, 75, 100, 125))+
+  theme_light()+
+  labs( x = "Year",
+        y = "Number of Juvenile Hare Trapped",
+        title = "Annual Juvenile Hare Trap Counts",
+        subtitle = "1999-2012")+
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5),
-        axis.title.x = element_text(vjust = 0.2))
+        axis.title.x = element_text(vjust = 0.2),
+        panel.background = element_rect(fill = "cornsilk",
+                                colour = "cornsilk"))
 
 annual_juvenile_graph
+
 ```
 
 ```{r}
@@ -84,10 +94,9 @@ ggplotly(annual_juvenile_graph)
 ```
 **Figure 1:** Annual juvenile hare trap counts- 
 
-The data visualization clearly shows that there is a huge variation between years in the number of juvenile hares that were collected. The max was 126 in 1999 and the minimum was 2 in 2010, excluding the years there were no data. In general, there is a larger number of hares collected in the first few years of the study than in the last part. The mean number of juvenile hares trapped over the 13 year period is 31.5 while the median is only 18.5. In moving forward, I would make sure that the people collecting data know that it is crucial to have uniform sampling effort from year to year. This means sampling at similar times each month with the same amount of traps set and the same amount of days. If the effort varies from year to year, the data will no longer reflect actual sample size. 
 
 
-```{r, include = FALSE}
+```{r}
 ## Use table to get summary statistics for yearly traps
 juvenile_summary_table <- juvenile_table %>% 
   summarise(mean_traps = mean(count),
@@ -97,6 +106,29 @@ juvenile_summary_table <- juvenile_table %>%
 
 ```
 
+
+The data visualization clearly shows that there is a huge variation between years in the number of juvenile hares that were collected. The max was `r juvenile_summary_table$max_traps` and the minimum was `r juvenile_summary_table$min_traps`, excluding the years there were no data. In general, there is a larger number of hares collected in the first few years of the study than in the last part. The mean number of juvenile hares trapped over the 13 year period is `r juvenile_summary_table$mean_traps` while the median is only `r juvenile_summary_table$median_traps`. In moving forward, I would make sure that the people collecting data know that it is crucial to have uniform sampling effort from year to year. This means sampling at similar times each month with the same amount of traps set and the same amount of days. If the effort varies from year to year, the data will no longer reflect actual sample size. 
+
+
+
 ## Visulize juvenile hare weights
+
+```{r}
+# visualize data where only juvenile hares are compared by sex and site
+ggplot(data = juvenile_hare_traps, aes(x = sex, y = weight)) +
+  geom_beeswarm(aes(color = sex)) +
+  scale_color_manual(values = c("coral1","cornflowerblue","azure4")) +
+  theme_minimal() +
+  labs(x = "Sex",
+       y = "Weight (g)",
+       title = "Juvenile Hare Weight (g) by Sex and Grid") +
+ theme(plot.title=element_text(hjust = 0.5,
+                               plot.)) +
+  facet_wrap(~grid)
+
+  
+  
+
+```
 
 
