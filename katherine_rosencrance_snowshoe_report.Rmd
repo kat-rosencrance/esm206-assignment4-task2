@@ -4,8 +4,99 @@ author: "Katherine Rosencrance"
 date: "11/7/2021"
 output: html_document
 ---
+# Introduction
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+# Data and Analysis
+
+
+# Juvenile Hare Initial Investigation
+
+
+
+## Annual juvenile hare trap counts
+
+```{r setup, include = FALSE, message = FALSE}
+
+# Install packages
+
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(lubridate)
+library(plotly)
+
 ```
+
+```{r, include = FALSE}
+
+# read in the data
+
+bonanza_hares <- read_csv(here("data", "bonanza_hares.csv"))
+
+```
+
+```{r, include = FALSE}
+
+# Wrangle to produce graph of total number of juvenile trappings during each year of the study
+
+## filter by age, convert dates into usable format, and add a new column with year
+juvenile_hare_traps <- bonanza_hares %>% 
+  filter(age == "j") %>% 
+  mutate(date = mdy(date)) %>% 
+  mutate(year = year(date)) %>%
+  
+  ## group by year
+  group_by(year)
+```
+
+```{r, include = FALSE}
+## create summary table to include count of traps by year
+
+juvenile_table <- juvenile_hare_traps %>% 
+  group_by(year) %>% 
+  summarise(count = n())
+
+```
+
+
+```{r}
+
+## produce graph
+annual_juvenile_graph <- ggplot(data = juvenile_table, aes(x = year, y = count)) +
+  geom_bar(color = "coral4", fill = "coral3", stat = "identity")+
+  scale_x_continuous(breaks = 1999:2012)+
+  scale_y_continuous(limits=c(0, 130), breaks = c(0, 25, 50, 75, 100, 125))+
+  theme_light()+
+  labs( x = "Year", y = "Number of Juvenile Hare Traps", title = "Annual Juvenile Hare Trap Counts", subtitle = "1999-2012")+
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        axis.title.x = element_text(vjust = 0.2))
+
+annual_juvenile_graph
+```
+
+```{r, include = FALSE}
+## make it interactive
+ggplotly(annual_juvenile_graph)
+
+```
+**Figure 1:** Annual juvenile hare trap counts- 
+
+The data visualization clearly shows that there is a huge variation between years in the number of juvenile hares that were collected. The max was 126 in 1999 and 
+
+
+
+```{r, include = FALSE}
+## Use table to get summary statistics for yearly traps
+juvenile_summary_table <- juvenile_table %>% 
+  summarise(mean_traps = mean(count),
+            median_traps = median(count),
+            max_traps = max(count),
+            min_traps = min(count))
+
+juvenile_summary_table
+```
+
 
