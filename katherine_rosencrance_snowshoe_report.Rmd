@@ -170,6 +170,43 @@ juv_summary_table %>%
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
 ```
 
+```{r}
+# pull vectors of weight for male and female
+m_weight <- juvenile_for_beeswarm %>% 
+  filter(sex == "male") %>%
+  filter(weight != "unknown") %>% 
+  pull(weight)
+
+f_weight <- juvenile_for_beeswarm %>% 
+  filter(sex == "female") %>% 
+  filter(weight != "unknown") %>% 
+  pull(weight)
+
+# Plot histograms and qqplots to check assumptions
+hist(m_weight) # Looks relatively normal, maybe negatively skewed
+qqnorm(m_weight) # Relatively linear
+hist(f_weight) # Possibly a bit negatively skewed
+qqnorm(f_weight) # Looks very linear
+
+# Assumptions look correct, everything looks relatively normally distributed and linear
+
+# Run the t test
+juvenile_ttest <- t.test(f_weight, f_weight)
+
+# Get the tidy model results to call outputs in-line
+juvenile_ttest_tidy <- tidy(juvenile_ttest)
+
+# Get the means & SDs for each: 
+male_mean <- mean(m_weight)
+female_mean <- mean(f_weight)
+male_sd <- sd(m_weight)
+female_sd <- sd(f_weight)
+
+# Effect size
+mf_effsize <- cohen.d(m_weight, f_weight)
+
+mf_effsize
+```
 
 
 
