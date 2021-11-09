@@ -28,6 +28,7 @@ library(here)
 library(lubridate)
 library(plotly)
 library(ggbeeswarm)
+library(RColorBrewer)
 
 ```
 
@@ -72,18 +73,17 @@ annual_juvenile_graph <- ggplot(data = juvenile_table, aes(x = year, y = count))
   scale_x_continuous(breaks = 1999:2012)+
   scale_y_continuous(limits=c(0, 130),
                      breaks = c(0, 25, 50, 75, 100, 125))+
-  theme_light()+
+  theme_gray()+
   labs( x = "Year",
         y = "Number of Juvenile Hare Trapped",
         title = "Annual Juvenile Hare Trap Counts",
         subtitle = "1999-2012")+
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5),
-        axis.title.x = element_text(vjust = 0.2),
-        panel.background = element_rect(fill = "cornsilk",
-                                colour = "cornsilk"))
+        axis.title.x = element_text(vjust = 0.2))
 
 annual_juvenile_graph
+
 
 ```
 
@@ -114,21 +114,62 @@ The data visualization clearly shows that there is a huge variation between year
 ## Visulize juvenile hare weights
 
 ```{r}
-# visualize data where only juvenile hares are compared by sex and site
-ggplot(data = juvenile_hare_traps, aes(x = sex, y = weight)) +
-  geom_beeswarm(aes(color = sex)) +
+# Create new subset with names in observations changed to full names
+juvenile_for_beeswarm <- juvenile_hare_traps %>% 
+  mutate(grid = case_when(grid == "bonrip" ~ "Riparian",
+    grid == "bonmat" ~ "Mature",
+    grid == "bonbs" ~ "Black Spruce")) %>% 
+    mutate(sex = case_when(
+      sex == "f" ~ "female",
+      sex == "m" ~ "male",
+      is.na(sex) == TRUE ~ "unknown"))
+
+# Visualize data where only juvenile hares are compared by sex and site
+ggplot(data = juvenile_for_beeswarm, aes(x = sex, y = weight, color = sex)) +
+  geom_beeswarm(cex = 3) +
   scale_color_manual(values = c("coral1","cornflowerblue","azure4")) +
   theme_minimal() +
+  stat_summary(fun=mean, 
+               geom="point", 
+               shape=20, 
+               size=4, 
+               color="black", 
+               fill="black")+
   labs(x = "Sex",
        y = "Weight (g)",
        title = "Juvenile Hare Weight (g) by Sex and Grid") +
- theme(plot.title=element_text(hjust = 0.5,
-                               plot.)) +
+ theme(plot.title=element_text(hjust = 0.5),
+       panel.border = element_rect(colour = "black",
+                                   fill=NA,
+                                   size=0.5)) +
   facet_wrap(~grid)
 
   
   
 
 ```
+**Figure 2:** Weight observations for juvenile hares taken at 3 different sites. The sites include a mature lowland black spruce stand (Black Spruce), stands of mature white spruce, paper birch, and alder, as well as black spruce (Mature), and flood zone along the Tanana River (Riparian). Females are represented by the coral points and male represented by blue. Hares trapped, but with no sex, are represented as gray points. Weight is measured in grams.
+
+This graph displays the distribution of hare weight according to sex and site. It can be observed that there were a lot more hares trapped in the riparian site than the other two sites. 
+
+## Juvenile Weight Comparison (Male and Female snowshoe hare)
+
+```{r}
+# Create table of summary statistics for male and female hare weight
+
+juv_summary_table <- juvenile_for_beeswarm %>%
+  filter(sex != "unknown") %>% 
+  group_by(sex) %>% 
+  summarize(mean_weight = round(mean(weight, na.rm = TRUE),2),
+    sd_weight = round(sd(weight, na.rm = TRUE),2),
+    n = n()
+  )
+
+juv_summary_table %>% 
+  kable(col.names = c("Sex", "Mean weight (g)", "Standard deviation (g)", "Sample size"), caption = "Table 1: Summary Statistics for male and female hares captured from 1999-2012") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+```
+
+
 
 
