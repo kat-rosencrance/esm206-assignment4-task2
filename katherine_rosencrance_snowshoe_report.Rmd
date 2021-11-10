@@ -96,7 +96,7 @@ ggplotly(annual_juvenile_graph)
 
 ```
 
-**Figure 1: Annual juvenile hare trap counts from 1999-2012.** Height of the bar indicates the amount of hares trapped that year at all 3 sites combined. 
+**Figure 1: Annual juvenile hare trap counts from 1999-2012.** Height of the bar indicates the amount of hares trapped that year at all 3 sites combined.
 
 ```{r, include = FALSE}
 ## Use table to get summary statistics for yearly traps
@@ -109,6 +109,8 @@ juvenile_summary_table <- juvenile_table %>%
 juvenile_summary_table
 
 ```
+
+### Analysis
 
 The data visualization clearly shows that there is a large variation between years in the number of juvenile hares that were collected. The max was `r juvenile_summary_table$max_traps` while the minimum was only `r juvenile_summary_table$min_traps`, excluding the years there were no data. In general, there is a larger number of hares collected in the first few years of the study than in the last. In fact, the first year of the study had the highest amount of hares trapped. The mean number of juvenile hares trapped over the 13 year period is `r juvenile_summary_table$mean_traps` while the median is only `r juvenile_summary_table$median_traps`. In moving forward, I would make sure that the people collecting data know that it is crucial to have uniform sampling effort from year to year. This means sampling at similar times each month with the same amount of traps set and the same amount of days. If the effort varies from year to year, the data will no longer reflect actual sample size.
 
@@ -155,6 +157,8 @@ juv_sex_graph <- ggplot(data = juvenile_for_beeswarm, aes(x = sex, y = weight, c
 
 **Figure 2: Weight observations (in grams) for juvenile hares taken at 3 different sites.** The sites include a mature lowland black spruce stand (Black Spruce), stands of mature white spruce, paper birch, and alder, as well as black spruce (Mature), and flood zone along the Tanana River (Riparian). Females are represented by the yellow points and male represented by brown. Hares trapped, but with no recorded sex, are represented as gray points. The black points represent the mean number of hares for each sex.
 
+### Analysis
+
 This graph displays the distribution of hare weight according to sex and site. It can be observed that there were a lot more hares trapped in the riparian site than the other two sites. In addition, one can see that at every site, the male mean is greater than the female mean, leading us to the conclusion that male hares, in accordance with normal sexual dimorphism patterns, are usually larger. It may also be important to observe that the means for all 3 sites fall within a close range of 800-1100 grams.
 
 ## C. Juvenile weight comparison (male and female snowshoe hare)
@@ -175,8 +179,6 @@ juv_summary_table %>%
   kable_classic(position = "center")
 
 ```
-
-
 
 ```{r, include = FALSE}
 # pull vectors of weight for male and female
@@ -219,7 +221,9 @@ mf_effsize <- cohen.d(m_weight, f_weight)
 mf_effsize
 ```
 
-The means of males versus females were compared using a few different statistical tests. Initially, the actual difference in mean was calculated to be `r round(mean_difference,2)` (grams). This number alone may not be enough to really tell if the means are statistically different. Upon running a t-test, the p-value returned as `r round(juvenile_ttest_tidy$p.value,3)`. This means that there is only a 0.7% chance that if you take 2 samples from populations with the same means the difference would be at least this different. This would normally lead one to believe that the male and female weights are sigificantly different, however the effect size was also calculated using the Cohen's d test. This rendered an effect size of `r round(mf_effsize$estimate,2)` which is interpreted as small. While the statistical t-test renders the means different, the effect size is small meaning the difference is negligible.  
+### Analysis
+
+The means of males versus females were compared using a few different statistical tests. Initially, the actual difference in mean was calculated to be `r round(mean_difference,2)` (grams). This number alone may not be enough to really tell if the means are statistically different. Upon running a t-test, the p-value returned as `r round(juvenile_ttest_tidy$p.value,3)`. This means that there is only a 0.7% chance that if you take 2 samples from populations with the same means the difference would be at least this different. This would normally lead one to believe that the male and female weights are sigificantly different, however the effect size was also calculated using the Cohen's d test. This rendered an effect size of `r round(mf_effsize$estimate,2)` which is interpreted as small. While the statistical t-test renders the means different, the effect size is small meaning the difference is negligible.
 
 ## D. Relationship between juvenile weight and hind foot length
 
@@ -244,7 +248,7 @@ juvenile_cor_tidy <- tidy(juvenile_cor)
 ```{r}
 # Create graph exploring correlation between hind foot length and weight in juvenile hares
 
-ggplot(data = juvenile_for_beeswarm, aes(x = hindft, y = weight))+
+hindft_weight_graph <- ggplot(data = juvenile_for_beeswarm, aes(x = hindft, y = weight))+
   geom_point(size = 2, color = "goldenrod")+
   theme_bw()+
   theme(plot.title=element_text(hjust = 0.5, face = "bold"))+
@@ -255,17 +259,32 @@ ggplot(data = juvenile_for_beeswarm, aes(x = hindft, y = weight))+
   labs(x = "Hind foot Length (mm)", y = "Weight (g)", title = "Hind foot Length (mm) Vs Weight (g) in Juvenile Snowshoe Hares",
        subtitle = "1999-2012")+
    geom_smooth(method = "lm", se = FALSE, color = "black")
+
+ggplotly(hindft_weight_graph)
 ```
 
 **Figure 3: Hind foot length (mm) versus weight (g) in juvenile snowshoe hares.** Hind foot length is measured in mm and weight is measured in grams. Each point represents a hare observed at the specific weight and hind foot length. The black line is the line of best fit in the model.
 
+### Analysis
+
 The relationship between hare hind foot length and weight, upon observation, is positively correlated. After running a linear regression, one can see that the p-value returned was `r juvenile_lm_glance$p.value`. This is a very low p-value so one might conclude that the likelihood of getting two samples this different if samples were taken from populations with the same mean is very small. In addition, the p-value rendered when comparing the hind foot and weight via a Pearson's correlation was also low. The r squared value of `r round(juvenile_lm_glance$r.squared, 2)` however, represents the fact that only 30% of the variation in hind foot length is attributed to weight. This means that other factors like sex and age should be taken into account when seeing what affects hind foot length.
 
+# IV. Summary
 
-## Summary
+Exploratory data analysis findings include:
 
+-   More hares were collected in the beginning of the study
 
+-   Male hares tend to be bigger than female hares
 
-# IV. Citation
+-   The most hares were caught in the riparian site
+
+-   Male and female weights are
+
+-   The relationship between hind foot length and weight may seem positively correlated at first, but furhter analysis concludes that weight only attributes a small amount to the change in hind foot size
+
+-   More factors need to be included in studying the relationship of hind foot size and weight
+
+# V. Citation
 
 **Data citation:** Kielland, K., F.S. Chapin, R.W. Ruess, and Bonanza Creek LTER. 2017. Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Present ver 22. Environmental Data Initiative. <https://doi.org/10.6073/pasta/03dce4856d79b91557d8e6ce2cbcdc14>
