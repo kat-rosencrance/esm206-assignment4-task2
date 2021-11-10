@@ -126,7 +126,7 @@ juvenile_for_beeswarm <- juvenile_hare_traps %>%
       is.na(sex) == TRUE ~ "unknown"))
 
 # Visualize data where only juvenile hares are compared by sex and site
-ggplot(data = juvenile_for_beeswarm, aes(x = sex, y = weight, color = sex)) +
+juv_sex_graph <- ggplot(data = juvenile_for_beeswarm, aes(x = sex, y = weight, color = sex)) +
   geom_beeswarm(cex = 3) +
   stat_summary(fun=mean, 
                geom="point", 
@@ -148,7 +148,7 @@ ggplot(data = juvenile_for_beeswarm, aes(x = sex, y = weight, color = sex)) +
   theme(plot.background = element_rect(fill = "floralwhite")) +
   facet_wrap(~grid)
 
-  
+ ggplotly(juv_sex_graph) 
   
 
 ```
@@ -172,7 +172,7 @@ juv_summary_table <- juvenile_for_beeswarm %>%
 
 juv_summary_table %>% 
   kable(col.names = c("Sex", "Mean weight (g)", "Standard deviation (g)", "Sample size"), caption = "Table 1: Summary statistics for male and female hares captured from 1999-2012") %>% 
-  kable_classic(full_width = FALSE, position = "left")
+  kable_classic(position = "center")
 
 ```
 
@@ -199,7 +199,7 @@ qqnorm(f_weight) # Looks very linear
 # Assumptions look correct, everything looks relatively normally distributed and linear
 
 # Run the t test
-juvenile_ttest <- t.test(f_weight, f_weight)
+juvenile_ttest <- t.test(f_weight, m_weight)
 
 # Get the tidy model results to call outputs in-line
 juvenile_ttest_tidy <- tidy(juvenile_ttest)
@@ -210,13 +210,16 @@ female_mean <- mean(f_weight)
 male_sd <- sd(m_weight)
 female_sd <- sd(f_weight)
 
+mean_difference <- male_mean - female_mean
+
+
 # Effect size
 mf_effsize <- cohen.d(m_weight, f_weight)
 
 mf_effsize
 ```
 
-My main takeaways from this data is that
+The means of males versus females were compared using a few different statistical tests. Initially, the actual difference in mean was calculated to be `r round(mean_difference,2)` (grams). This number alone may not be enough to really tell if the means are statistically different. Upon running a t-test, the p-value returned as `r round(juvenile_ttest_tidy$p.value,3)`. This means that there is only a 0.7% chance that if you take 2 samples from populations with the same means the difference would be at least this different. This would normally lead one to believe that the male and female weights are sigificantly different, however the effect size was also calculated using the Cohen's d test. This rendered an effect size of `r round(mf_effsize$estimate,2)` which is interpreted as small. While the statistical t-test renders the means different, the effect size is small meaning the difference is negligible.  
 
 ## D. Relationship between juvenile weight and hind foot length
 
@@ -242,18 +245,26 @@ juvenile_cor_tidy <- tidy(juvenile_cor)
 # Create graph exploring correlation between hind foot length and weight in juvenile hares
 
 ggplot(data = juvenile_for_beeswarm, aes(x = hindft, y = weight))+
-  geom_point(size = 2, color = "thistle")+
-  theme_dark()+
-  theme(plot.title=element_text(hjust = 0.5))+
-  theme(plot.subtitle=element_text(hjust = 0.5))+
-  labs(x = "Hindfoot Length (mm)", y = "Weight (g)", title = "Hindfoot Length (mm) Vs Weight (g) in Juvenile Snowshoe Hares",
+  geom_point(size = 2, color = "goldenrod")+
+  theme_bw()+
+  theme(plot.title=element_text(hjust = 0.5, face = "bold"))+
+  theme(plot.subtitle=element_text(hjust = 0.5, face = "bold"))+
+  theme(plot.background = element_rect(fill = "floralwhite"))+
+  theme(axis.title.x = element_text(face = "bold"))+
+  theme(axis.title.y = element_text(face = "bold"))+
+  labs(x = "Hind foot Length (mm)", y = "Weight (g)", title = "Hind foot Length (mm) Vs Weight (g) in Juvenile Snowshoe Hares",
        subtitle = "1999-2012")+
-   geom_smooth(method = "lm", se = FALSE, color = "cornsilk")
+   geom_smooth(method = "lm", se = FALSE, color = "black")
 ```
 
-**Figure 3:** Hindfoot length (mm) versus weight (g) in juvenile snowshoe hares.
+**Figure 3: Hind foot length (mm) versus weight (g) in juvenile snowshoe hares.** Hind foot length is measured in mm and weight is measured in grams. Each point represents a hare observed at the specific weight and hind foot length. The black line is the line of best fit in the model.
+
+The relationship between hare hind foot length and weight, upon observation, is positively correlated. After running a linear regression, one can see that the p-value returned was `r juvenile_lm_glance$p.value`. This is a very low p-value so one might conclude that the likelihood of getting two samples this different if samples were taken from populations with the same mean is very small. In addition, the p-value rendered when comparing the hind foot and weight via a Pearson's correlation was also low. The r squared value of `r round(juvenile_lm_glance$r.squared, 2)` however, represents the fact that only 30% of the variation in hind foot length is attributed to weight. This means that other factors like sex and age should be taken into account when seeing what affects hind foot length.
+
 
 ## Summary
+
+
 
 # IV. Citation
 
