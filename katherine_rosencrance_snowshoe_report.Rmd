@@ -1,22 +1,23 @@
 ---
-title: "Juvenile Snowshoe Hare Exploratory Report"
+title: "Juvenile Snowshoe Hares: Mini Exploratory Report"
 author: "Katherine Rosencrance"
 date: "11/7/2021"
 output: 
-  html_document: 
-    theme: lumen
+   html_document: 
+     theme: journal
 ---
-# Introduction
 
+# **I. Introduction**
 
-# Data and Analysis
+This report explores several characteristics of juvenile snowshoe hares (*Lepus americanus*) live-trapped as part of a long term ecological research study at the Bonanza Creek Experimental Forest. Hares were trapped from 1999-2012 at 3 different sampling sites, or "grids". The sites included a flood zone along the Tanana River (Bonanza Riparian), mature stands of white spruce, paper birch, alder, black spruce, Labrador tea, willows, and prickly rose (Bonanza Mature), and a mature lowland black spruce stand (Black Spruce). Researchers recorded the date each hare was trapped as well as physical measurements for each (Kielland et al., 2017). The following sections include visualizations and analyses on juvenile hares only, comparing trap numbers per year , their weight by sex and site, and displaying the relationship between hind foot length and individual weight.
 
+# **II. Data and Analysis**
 
-# Juvenile Hare Initial Investigation
+Dr. Knut Kielland and colleagues collected these data to explore population densities in boreal regions of northern Alaska with the Bonanza Creek LTER (long term ecological research)(Kielland et al., 2017). The data contains physical measurements for hare ear size, weight, sex, age, and hind foot length. First, the report visualizes hares trapped per year and the weight of male hares versus female hares at each site. It goes on to compare male and female hare weight using an unpaired t-test (significance level of 0.05) and Cohen's d effect size. The relationship of hind foot length and weight is explained through a simple linear regression and Pearson's r correlation. All analyses are in R version 4.1.1 using RStudio.
 
+# **III. Juvenile Hare Initial Investigation**
 
-
-## Annual juvenile hare trap counts
+## A. Annual juvenile hare trap counts
 
 ```{r setup, include = FALSE, message = FALSE}
 
@@ -63,26 +64,26 @@ juvenile_table <- juvenile_hare_traps %>%
 
 ```
 
-
 ```{r include = FALSE}
 
 ## produce graph
 annual_juvenile_graph <- ggplot(data = juvenile_table, aes(x = year, y = count)) +
-  geom_bar(color = "coral4",
-           fill = "coral3",
-           stat = "identity",
-           alpha = 0.7)+
+  geom_bar(color = "goldenrod2",
+           fill = "goldenrod3",
+           stat = "identity")+
   scale_x_continuous(breaks = 1999:2012)+
   scale_y_continuous(limits=c(0, 130),
                      breaks = c(0, 25, 50, 75, 100, 125))+
-  theme_gray()+
+  theme_bw()+
   labs( x = "Year",
-        y = "Number of Juvenile Hare Trapped",
+        y = "Number of Juvenile Hares Trapped",
         title = "Annual Juvenile Hare Trap Counts",
         subtitle = "1999-2012")+
-  theme(plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5),
-        axis.title.x = element_text(vjust = 0.2))
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, face = "bold"),
+        axis.title.x = element_text(vjust = 0.2, face = "bold"),
+        axis.title.y = element_text(face = "bold"))+
+  theme(plot.background = element_rect(fill = "floralwhite"))
 
 annual_juvenile_graph
 
@@ -95,12 +96,9 @@ ggplotly(annual_juvenile_graph)
 
 ```
 
+**Figure 1: Annual juvenile hare trap counts from 1999-2012.** Height of the bar indicates the amount of hares trapped that year at all 3 sites combined. 
 
-**Figure 1:** Annual juvenile hare trap counts- 
-
-
-
-```{r}
+```{r, include = FALSE}
 ## Use table to get summary statistics for yearly traps
 juvenile_summary_table <- juvenile_table %>% 
   summarise(mean_traps = mean(count),
@@ -108,17 +106,16 @@ juvenile_summary_table <- juvenile_table %>%
             max_traps = max(count),
             min_traps = min(count))
 
+juvenile_summary_table
+
 ```
 
+The data visualization clearly shows that there is a large variation between years in the number of juvenile hares that were collected. The max was `r juvenile_summary_table$max_traps` while the minimum was only `r juvenile_summary_table$min_traps`, excluding the years there were no data. In general, there is a larger number of hares collected in the first few years of the study than in the last. In fact, the first year of the study had the highest amount of hares trapped. The mean number of juvenile hares trapped over the 13 year period is `r juvenile_summary_table$mean_traps` while the median is only `r juvenile_summary_table$median_traps`. In moving forward, I would make sure that the people collecting data know that it is crucial to have uniform sampling effort from year to year. This means sampling at similar times each month with the same amount of traps set and the same amount of days. If the effort varies from year to year, the data will no longer reflect actual sample size.
 
-The data visualization clearly shows that there is a huge variation between years in the number of juvenile hares that were collected. The max was `r juvenile_summary_table$max_traps` and the minimum was `r juvenile_summary_table$min_traps`, excluding the years there were no data. In general, there is a larger number of hares collected in the first few years of the study than in the last part. The mean number of juvenile hares trapped over the 13 year period is `r juvenile_summary_table$mean_traps` while the median is only `r juvenile_summary_table$median_traps`. In moving forward, I would make sure that the people collecting data know that it is crucial to have uniform sampling effort from year to year. This means sampling at similar times each month with the same amount of traps set and the same amount of days. If the effort varies from year to year, the data will no longer reflect actual sample size. 
-
-
-
-## Visulize juvenile hare weights
+## B. Visualize juvenile hare weights
 
 ```{r}
-# Create new subset with names in observations changed to full names
+# Create new subset with names in observations changed to full names * note this is called "for beeswarm" but used for other analyses
 juvenile_for_beeswarm <- juvenile_hare_traps %>% 
   mutate(grid = case_when(grid == "bonrip" ~ "Riparian",
     grid == "bonmat" ~ "Mature",
@@ -131,21 +128,24 @@ juvenile_for_beeswarm <- juvenile_hare_traps %>%
 # Visualize data where only juvenile hares are compared by sex and site
 ggplot(data = juvenile_for_beeswarm, aes(x = sex, y = weight, color = sex)) +
   geom_beeswarm(cex = 3) +
-  scale_color_manual(values = c("coral1","cornflowerblue","azure4")) +
-  theme_minimal() +
   stat_summary(fun=mean, 
                geom="point", 
                shape=20, 
                size=4, 
                color="black", 
                fill="black")+
+  scale_color_manual(values = c("goldenrod1","goldenrod4","azure4")) +
+  theme_bw() +
   labs(x = "Sex",
        y = "Weight (g)",
        title = "Juvenile Hare Weight (g) by Sex and Grid") +
- theme(plot.title=element_text(hjust = 0.5),
+ theme(plot.title=element_text(hjust = 0.5, face = "bold"),
+       axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
        panel.border = element_rect(colour = "black",
                                    fill=NA,
-                                   size=0.5)) +
+                                   size=0.5))+
+  theme(plot.background = element_rect(fill = "floralwhite")) +
   facet_wrap(~grid)
 
   
@@ -153,11 +153,11 @@ ggplot(data = juvenile_for_beeswarm, aes(x = sex, y = weight, color = sex)) +
 
 ```
 
-**Figure 2:** Weight observations for juvenile hares taken at 3 different sites. The sites include a mature lowland black spruce stand (Black Spruce), stands of mature white spruce, paper birch, and alder, as well as black spruce (Mature), and flood zone along the Tanana River (Riparian). Females are represented by the coral points and male represented by blue. Hares trapped, but with no sex, are represented as gray points. Weight is measured in grams.
+**Figure 2: Weight observations (in grams) for juvenile hares taken at 3 different sites.** The sites include a mature lowland black spruce stand (Black Spruce), stands of mature white spruce, paper birch, and alder, as well as black spruce (Mature), and flood zone along the Tanana River (Riparian). Females are represented by the yellow points and male represented by brown. Hares trapped, but with no recorded sex, are represented as gray points. The black points represent the mean number of hares for each sex.
 
-This graph displays the distribution of hare weight according to sex and site. It can be observed that there were a lot more hares trapped in the riparian site than the other two sites. 
+This graph displays the distribution of hare weight according to sex and site. It can be observed that there were a lot more hares trapped in the riparian site than the other two sites. In addition, one can see that at every site, the male mean is greater than the female mean, leading us to the conclusion that male hares, in accordance with normal sexual dimorphism patterns, are usually larger. It may also be important to observe that the means for all 3 sites fall within a close range of 800-1100 grams.
 
-## Juvenile Weight Comparison (Male and Female snowshoe hare)
+## C. Juvenile weight comparison (male and female snowshoe hare)
 
 ```{r}
 # Create table of summary statistics for male and female hare weight
@@ -171,11 +171,14 @@ juv_summary_table <- juvenile_for_beeswarm %>%
   )
 
 juv_summary_table %>% 
-  kable(col.names = c("Sex", "Mean weight (g)", "Standard deviation (g)", "Sample size"), caption = "Table 1: Summary Statistics for male and female hares captured from 1999-2012") %>% 
-  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+  kable(col.names = c("Sex", "Mean weight (g)", "Standard deviation (g)", "Sample size"), caption = "Table 1: Summary statistics for male and female hares captured from 1999-2012") %>% 
+  kable_classic(full_width = FALSE, position = "left")
+
 ```
 
-```{r}
+
+
+```{r, include = FALSE}
 # pull vectors of weight for male and female
 m_weight <- juvenile_for_beeswarm %>% 
   filter(sex == "male") %>%
@@ -212,9 +215,10 @@ mf_effsize <- cohen.d(m_weight, f_weight)
 
 mf_effsize
 ```
+
 My main takeaways from this data is that
 
-## Relationship between juvenile weight and hind foot length
+## D. Relationship between juvenile weight and hind foot length
 
 ```{r}
 # Do linear regression
@@ -234,7 +238,6 @@ juvenile_cor <- cor.test(juvenile_for_beeswarm$weight, juvenile_for_beeswarm$hin
 juvenile_cor_tidy <- tidy(juvenile_cor)
 ```
 
-
 ```{r}
 # Create graph exploring correlation between hind foot length and weight in juvenile hares
 
@@ -248,6 +251,10 @@ ggplot(data = juvenile_for_beeswarm, aes(x = hindft, y = weight))+
    geom_smooth(method = "lm", se = FALSE, color = "cornsilk")
 ```
 
-**Figure 3:** Hindfoot length (mm) versus weight (g) in juvenile snowshoe hares.  
+**Figure 3:** Hindfoot length (mm) versus weight (g) in juvenile snowshoe hares.
 
+## Summary
 
+# IV. Citation
+
+**Data citation:** Kielland, K., F.S. Chapin, R.W. Ruess, and Bonanza Creek LTER. 2017. Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Present ver 22. Environmental Data Initiative. <https://doi.org/10.6073/pasta/03dce4856d79b91557d8e6ce2cbcdc14>
