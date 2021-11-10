@@ -7,15 +7,15 @@ output:
      theme: journal
 ---
 
-# **I. Introduction**
+# I. Introduction
 
 This report explores several characteristics of juvenile snowshoe hares (*Lepus americanus*) live-trapped as part of a long term ecological research study at the Bonanza Creek Experimental Forest. Hares were trapped from 1999-2012 at 3 different sampling sites, or "grids". The sites included a flood zone along the Tanana River (Bonanza Riparian), mature stands of white spruce, paper birch, alder, black spruce, Labrador tea, willows, and prickly rose (Bonanza Mature), and a mature lowland black spruce stand (Black Spruce). Researchers recorded the date each hare was trapped as well as physical measurements for each (Kielland et al., 2017). The following sections include visualizations and analyses on juvenile hares only, comparing trap numbers per year , their weight by sex and site, and displaying the relationship between hind foot length and individual weight.
 
-# **II. Data and Analysis**
+# II. Data and Analysis
 
 Dr. Knut Kielland and colleagues collected these data to explore population densities in boreal regions of northern Alaska with the Bonanza Creek LTER (long term ecological research)(Kielland et al., 2017). The data contains physical measurements for hare ear size, weight, sex, age, and hind foot length. First, the report visualizes hares trapped per year and the weight of male hares versus female hares at each site. It goes on to compare male and female hare weight using an unpaired t-test (significance level of 0.05) and Cohen's d effect size. The relationship of hind foot length and weight is explained through a simple linear regression and Pearson's r correlation. All analyses are in R version 4.1.1 using RStudio.
 
-# **III. Juvenile Hare Initial Investigation**
+# III. Juvenile Hare Initial Investigation
 
 ## A. Annual juvenile hare trap counts
 
@@ -232,7 +232,7 @@ The means of males versus females were compared using a few different statistica
 juvenile_lm <- lm(weight ~ hindft, data = juvenile_for_beeswarm)
 
 # Get tidy versions of the model output to call later on in text
-juvenile_lm_tidy_tidy <- tidy(juvenile_lm)
+juvenile_lm_tidy <- tidy(juvenile_lm)
 juvenile_lm_glance <- glance(juvenile_lm)
 
 # See model diagnostics:
@@ -263,11 +263,11 @@ hindft_weight_graph <- ggplot(data = juvenile_for_beeswarm, aes(x = hindft, y = 
 ggplotly(hindft_weight_graph)
 ```
 
-**Figure 3: Hind foot length (mm) versus weight (g) in juvenile snowshoe hares.** Hind foot length is measured in mm and weight is measured in grams. Each point represents a hare observed at the specific weight and hind foot length. The black line is the line of best fit in the model.β1 = 49.69 g mm-1, p < 0.001, R2 = 0.76, Pearson’s r = 0.87)
+**Figure 3: Hind foot length (mm) versus weight (g) in juvenile snowshoe hares.** Hind foot length is measured in mm and weight is measured in grams. Each point represents a hare observed at the specific weight and hind foot length. The black line is the line of best fit in the model.β1 = `r round(juvenile_lm_tidy$estimate[2], 2)` g mm-1, p < 0.001, R2 = `r round(juvenile_lm_glance$r.squared, 2)`, Pearson’s r = `r round(juvenile_cor_tidy$estimate,2)`)
 
 ### Analysis
 
-The relationship between hare hind foot length and weight, upon observation, is positively correlated. After running a linear regression, one can see that the p-value returned was `r juvenile_lm_glance$p.value`. This is a very low p-value so one might conclude that the likelihood of getting two samples this different if samples were taken from populations with the same mean is very small. In addition, the p-value rendered when comparing the hind foot and weight via a Pearson's correlation was also low. The r squared value of `r round(juvenile_lm_glance$r.squared, 2)` however, represents the fact that only `r (round(juvenile_lm_glance$r.squared,2))*100`% of the variation in weight is attributed to hind foot length. This means that other factors like sex and age should be taken into account when seeing what affects weight.
+The relationship between hare hind foot length and weight, upon observation, is positively correlated. After running a linear regression, one can see that the p-value returned was `r juvenile_lm_glance$p.value`. This is a very low p-value so one might conclude that the likelihood of getting two samples this different if samples were taken from populations with the same mean is very small. In addition, the estimate rendered when comparing the hind foot and weight via a Pearson's correlation was high at `r round(juvenile_cor_tidy$estimate,2)`. The r squared value of `r round(juvenile_lm_glance$r.squared, 2)` however, represents the fact that only `r (round(juvenile_lm_glance$r.squared,2))*100`% of the variation in weight is attributed to hind foot length. This means that other factors like sex and age should be taken into account when seeing what affects weight.
 
 # IV. Summary
 
