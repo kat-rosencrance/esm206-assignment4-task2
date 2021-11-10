@@ -13,7 +13,7 @@ This report explores several characteristics of juvenile snowshoe hares (*Lepus 
 
 # II. Data and Analysis
 
-Dr. Knut Kielland and colleagues collected these data to explore population densities in boreal regions of northern Alaska with the Bonanza Creek LTER (long term ecological research)(Kielland et al., 2017). The data contains physical measurements for hare ear size, weight, sex, age, and hind foot length. First, the report visualizes hares trapped per year and the weight of male hares versus female hares at each site. It goes on to compare male and female hare weight using an unpaired t-test (significance level of 0.05) and Cohen's d effect size. The relationship of hind foot length and weight is explained through a simple linear regression and Pearson's r correlation. All analyses are in R version 4.1.1 using RStudio.
+Dr. Knut Kielland and colleagues collected these data to explore population densities in boreal regions of northern Alaska with the Bonanza Creek LTER (long term ecological research)(Kielland et al., 2017). The data contain physical measurements for hare ear size, weight, sex, age, and hind foot length. First, the report visualizes hares trapped per year and the weight of male hares versus female hares at each site. It goes on to compare male and female hare weight using an unpaired t-test (significance level of 0.05) and Cohen's d effect size. The relationship of hind foot length and weight is explained through a simple linear regression and Pearson's r correlation. All analyses are in R version 4.1.1 using RStudio.
 
 # III. Juvenile Hare Initial Investigation
 
@@ -133,7 +133,7 @@ juv_sex_graph <- ggplot(data = juvenile_for_beeswarm, aes(x = sex, y = weight, c
   stat_summary(fun=mean, 
                geom="point", 
                shape=20, 
-               size=4, 
+               size=2, 
                color="black", 
                fill="black")+
   scale_color_manual(values = c("goldenrod1","goldenrod4","azure4")) +
@@ -223,7 +223,7 @@ mf_effsize
 
 ### Analysis
 
-The means of males versus females were compared using a few different statistical tests. Initially, the actual difference in mean was calculated to be `r round(mean_difference,2)` (grams). This number alone may not be enough to really tell if the means are statistically different. Upon running a t-test, the p-value returned as `r round(juvenile_ttest_tidy$p.value,3)`. This means that there is only a `r (round(juvenile_ttest_tidy$p.value,3))*100`% chance that if you take 2 samples from populations with the same means the difference would be at least this different. This would normally lead one to believe that the male and female weights are sigificantly different, however the effect size was also calculated using the Cohen's d test. This rendered an effect size of `r round(mf_effsize$estimate,2)` which is interpreted as small. While the statistical t-test renders the means different, the effect size is small meaning the difference is negligible.
+The means of males versus females were compared using a few different statistical tests. Initially, the actual difference in mean was calculated to be `r round(mean_difference,2)` (grams). This number alone may not be enough to really tell if the means are statistically different. Upon running a t-test, the p-value returned as `r round(juvenile_ttest_tidy$p.value,3)`. This would normally lead one to believe that the male and female weights are significantly different, however the effect size was also calculated using the Cohen's d test. This rendered an effect size of `r round(mf_effsize$estimate,2)` which is interpreted as small. While the statistical t-test renders the means different, the effect size is small meaning the difference is negligible.
 
 ## D. Relationship between juvenile weight and hind foot length
 
@@ -263,11 +263,11 @@ hindft_weight_graph <- ggplot(data = juvenile_for_beeswarm, aes(x = hindft, y = 
 ggplotly(hindft_weight_graph)
 ```
 
-**Figure 3: Hind foot length (mm) versus weight (g) in juvenile snowshoe hares.** Hind foot length is measured in mm and weight is measured in grams. Each point represents a hare observed at the specific weight and hind foot length. The black line is the line of best fit in the model.β1 = `r round(juvenile_lm_tidy$estimate[2], 2)` g mm-1, p < 0.001, R2 = `r round(juvenile_lm_glance$r.squared, 2)`, Pearson’s r = `r round(juvenile_cor_tidy$estimate,2)`)
+**Figure 3: Hind foot length (mm) versus weight (g) in juvenile snowshoe hares.** Hind foot length is measured in mm and weight is measured in grams. Each point represents a hare observed at the specific weight and hind foot length. The black line is the line of best fit in the model. β1 = `r round(juvenile_lm_tidy$estimate[2], 2)` g mm-1, p \< 0.001, R2 = `r round(juvenile_lm_glance$r.squared, 2)`, Pearson's r = `r round(juvenile_cor_tidy$estimate,2)`)
 
 ### Analysis
 
-The relationship between hare hind foot length and weight, upon observation, is positively correlated. After running a linear regression, one can see that the p-value returned was `r juvenile_lm_glance$p.value`. This is a very low p-value so one might conclude that the likelihood of getting two samples this different if samples were taken from populations with the same mean is very small. In addition, the estimate rendered when comparing the hind foot and weight via a Pearson's correlation was high at `r round(juvenile_cor_tidy$estimate,2)`. The r squared value of `r round(juvenile_lm_glance$r.squared, 2)` however, represents the fact that only `r (round(juvenile_lm_glance$r.squared,2))*100`% of the variation in weight is attributed to hind foot length. This means that other factors like sex and age should be taken into account when seeing what affects weight.
+The relationship between hare hind foot length and weight, upon observation, is positively correlated. After running a linear regression, the p-value returned was `r juvenile_lm_glance$p.value`. In addition, the estimate rendered when comparing the hind foot and weight via a Pearson's correlation was high at `r round(juvenile_cor_tidy$estimate,2)`. The r squared value of `r round(juvenile_lm_glance$r.squared, 2)` however, represents the fact that only `r (round(juvenile_lm_glance$r.squared,2))*100`% of the variation in weight is attributed to hind foot length. This means that other factors like sex and age should be taken into account when seeing what affects weight.
 
 # IV. Summary
 
@@ -279,9 +279,9 @@ Exploratory data analysis findings include:
 
 -   The most hares were caught in the riparian site
 
--   Male and female weights are
+-   Male and female weights are significantly different according to p-value, however the effect size is small so it can be concluded that the difference is negligible
 
--   The relationship between hind foot length and weight may seem positively correlated at first, but furhter analysis concludes that weight only attributes a small amount to the change in hind foot size
+-   The relationship between hind foot length and weight may seem positively correlated at first, but further analysis concludes that hind foot size only attributes a small amount to the weight
 
 -   More factors need to be included in studying the relationship of hind foot size and weight
 
